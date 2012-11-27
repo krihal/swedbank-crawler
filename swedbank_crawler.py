@@ -8,6 +8,7 @@ import cookielib
 import datetime
 import codecs
 import time
+import datetime
 from pyquery import PyQuery
 
 class SwedbankCrawler(object):
@@ -19,6 +20,7 @@ class SwedbankCrawler(object):
         self.response = ""
         self.cj = cookielib.LWPCookieJar()
         self.br = mechanize.Browser()
+        self.date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 
         self.__set_options__()
         self.__crawl__()
@@ -60,17 +62,14 @@ class SwedbankCrawler(object):
 
         self.response = self.br.response().read()
 
-    def __print_fund_name__(self, str):
+    def __fund_name__(self, str):
         if re.search(".+>Andelar</span>.+", str):
             return
-
-        print "\n%s:" % str.strip()
-
-        return "\n%s:" % str.strip()
+        self.lastfund = str.strip()
 
     def __print_fund_value__(self, str):
         fund = re.findall("\"[a-z_]+\"", str)
-        value = re.findall(">[0-9 ]+,[0-9]+<", str)
+        value = re.findall(">[0-9 \-]+,[0-9]+<", str)
 
         if fund == [] or value == []:
             return
@@ -98,10 +97,8 @@ class SwedbankCrawler(object):
         fund = fund.replace("rentefond_verde", "Värde")
         fund = fund.replace("rentefond_forendrproc", "Förändringsprocent")
         fund = fund.replace("rentefond_forendrkr", "Förändring")
-    
-        print "  %s: %s" % (fund, value)
 
-        return "  %s: %s" % (fund, value)
+        print "%s;%s;%s;%s" % (self.date, self.lastfund, fund, value)
 
     def __parse__(self):
         lines = self.response.split("\n")
@@ -115,8 +112,9 @@ class SwedbankCrawler(object):
 
             match = re.search("headers=\"rentefond_fond|aktiefond_fond|altplac_fond\">(\w+|\s+|\w)+", line)
             if match:            
-                self.__print_fund_name__(lines[linecnt])
+                self.__fund_name__(lines[linecnt])
                 continue
-        
+            
+            
 if __name__ == '__main__':
-    s = SwedbankCrawler("USERNAME", "PINCODE")
+    s = SwedbankCrawler("LOGIN", "PASSWORD")
