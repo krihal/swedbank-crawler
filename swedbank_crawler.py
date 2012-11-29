@@ -20,7 +20,7 @@ class SwedbankCrawler(object):
         self.response = ""
         self.cj = cookielib.LWPCookieJar()
         self.br = mechanize.Browser()
-        self.date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        self.date = datetime.datetime.now().strftime("%Y%m%d_%H%M")
 
         self.__set_options__()
         self.__crawl__()
