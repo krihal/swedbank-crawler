@@ -37,30 +37,32 @@ class SwedbankCrawler(object):
 
     def __crawl__(self):
         try:
-            self.br.open(self.url)
-            self.br.select_form(nr=0)
-            self.br.submit()
-            self.br.select_form(nr=0)
-            self.br.submit()
-            self.br.select_form(nr=1)
-            self.br["auth:kundnummer"] = self.username
-            self.br["auth:metod_2"] = ["PIN6"]
-            self.br.submit()
-            self.br.select_form(nr=1)
-            self.br["form:pinkod"] = self.password
-            self.br.submit()
-            self.br.select_form(nr=0)
-            self.br.submit()
+            br = self.br
+
+            br.open(self.url)
+            br.select_form(nr=0)
+            br.submit()
+            br.select_form(nr=0)
+            br.submit()
+            br.select_form(nr=1)
+            br["auth:kundnummer"] = self.username
+            br["auth:metod_2"] = ["PIN6"]
+            br.submit()
+            br.select_form(nr=1)
+            br["form:pinkod"] = self.password
+            br.submit()
+            br.select_form(nr=0)
+            br.submit()
             req = self.br.click_link(text_regex=re.compile("Inneh"))
-            self.br.open(req)
+            br.open(req)
             req = self.br.click_link(text_regex=re.compile("versikt"))
-            self.br.open(req)
+            br.open(req)
             req = self.br.click_link(text_regex=re.compile("apitalspar"))
-            self.br.open(req)
+            br.open(req)
         except Exception, e:
             print e
 
-        self.response = self.br.response().read()
+        self.response = br.response().read()
 
     def __fund_name__(self, str):
         if re.search(".+>Andelar</span>.+", str):
@@ -77,26 +79,12 @@ class SwedbankCrawler(object):
         fund = fund[0].replace("\"", "")
         value = value[0].replace(">", "").replace("<", "").replace(" ", "")
 
-        fund = fund.replace("altplac_andel", "Andel")
-        fund = fund.replace("altplac_kurs", "Kurs")
-        fund = fund.replace("altplac_anskverde", "Anskaffningsvärde")
-        fund = fund.replace("altplac_verde", "Värde")
-        fund = fund.replace("altplac_forendrkr", "Förändring")
-        fund = fund.replace("altplac_forendrproc", "Förändringsprocent")
-
-        fund = fund.replace("aktiefond_andel", "Andel")
-        fund = fund.replace("aktiefond_kurs", "Kurs")
-        fund = fund.replace("aktiefond_anskverde", "Anskaffningsvärde")
-        fund = fund.replace("aktiefond_verde", "Värde")
-        fund = fund.replace("aktiefond_forendrproc", "Förändringsprocent")
-        fund = fund.replace("aktiefond_forendrkr", "Förändring")
-
-        fund = fund.replace("rentefond_andel", "Andel")
-        fund = fund.replace("rentefond_kurs", "Kurs")
-        fund = fund.replace("rentefond_anskverde", "Anskaffningsvärde")
-        fund = fund.replace("rentefond_verde", "Värde")
-        fund = fund.replace("rentefond_forendrproc", "Förändringsprocent")
-        fund = fund.replace("rentefond_forendrkr", "Förändring")
+        fund = re.sub("\w+_andel", "Andel", fund)
+        fund = re.sub("\w+_kurs", "Kurs", fund)
+        fund = re.sub("\w+_verde", "Värde", fund)
+        fund = re.sub("\w+_forendrkr", "Förändring", fund)
+        fund = re.sub("\w+_anskverde", "Anskaffningsvärde", fund)
+        fund = re.sub("\w+_forendrproc", "Förändringsprocent", fund)
 
         print "%s;%s;%s;%s" % (self.date, self.lastfund, fund, value)
 
