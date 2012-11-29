@@ -3,12 +3,13 @@
 
 import re
 import os
+import sys
+import time
+import codecs
+import getopt
+import datetime
 import mechanize
 import cookielib
-import datetime
-import codecs
-import time
-import datetime
 from pyquery import PyQuery
 
 class SwedbankCrawler(object):
@@ -103,6 +104,27 @@ class SwedbankCrawler(object):
                 self.__fund_name__(lines[linecnt])
                 continue
             
-            
+def usage():
+    print "swedbank_crawler.py -u <username> -p <password>"
+    sys.exit(2)
+
+def main(argv):
+    try:
+        opts, args = getopt.getopt(argv,"hu:p:", [])
+    except getopt.GetoptError:
+        usage()
+
+    for opt, arg in opts:
+        if opt == "-h":
+            usage()
+        elif opt == "-u":
+            username = arg
+        elif opt == "-p":
+            password = arg
+        else:
+            usage()
+
+    swedbank = SwedbankCrawler(username, password)
+
 if __name__ == '__main__':
-    s = SwedbankCrawler("LOGIN", "PASSWORD")
+    main(sys.argv[1:])
