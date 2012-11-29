@@ -70,8 +70,8 @@ class SwedbankCrawler(object):
         self.lastfund = str.strip()
 
     def __print_fund_value__(self, str):
-        fund = re.findall("\"[a-z_]+\"", str)
-        value = re.findall(">[0-9 \-]+,[0-9]+<", str)
+        fund = re.findall("\"[\w_]+\"", str)
+        value = re.findall(">[\d\s\-]+,\d+<", str)
 
         if fund == [] or value == []:
             return
@@ -93,7 +93,7 @@ class SwedbankCrawler(object):
         linecnt = 0
         for line in lines:
             linecnt += 1
-            match = re.search("td headers.+>.+([A-Za-z]|[0-9])+<", line)
+            match = re.search("td headers.+>.+[\w\d]+<", line)
             if match:
                 self.__print_fund_value__(line)
                 continue
