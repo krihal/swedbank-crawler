@@ -21,7 +21,7 @@ class SwedbankCrawler(object):
         self.response = ""
         self.cj = cookielib.LWPCookieJar()
         self.br = mechanize.Browser()
-        self.date = datetime.datetime.now().strftime("%Y%m%d_%H%M")
+        self.date = datetime.datetime.now().strftime("%b-%d %H")
 
         self.__set_options__()
         self.__crawl__()
@@ -87,13 +87,23 @@ class SwedbankCrawler(object):
         fund = re.sub("\w+_anskverde", "Anskaffningsvärde", fund)
         fund = re.sub("\w+_forendrproc", "Förändringsprocent", fund)
 
-        print "%s;%s;%s;%s" % (self.date, self.lastfund, fund, value)
+        if fund == "Värde":
+            self.__write_file__(self.lastfund, ("%s;%s;%s" % (self.date, self.lastfund, value.replace(",", "."))))
+
+    def __write_file__(self, filename, str):
+        with open("data/" + filename.replace(" ", "_"), "a") as fd:
+            fd.write(str + "\n")
+            print "Writing file: %s" % filename
+
+        fd.close()
 
     def __parse__(self):
         lines = self.response.split("\n")
         linecnt = 0
+ 
         for line in lines:
             linecnt += 1
+
             match = re.search("td headers.+>.+[\w\d]+<", line)
             if match:
                 self.__print_fund_value__(line)
@@ -111,6 +121,7 @@ def usage():
 def main(argv):
     try:
         opts, args = getopt.getopt(argv,"hu:p:", [])
+
     except getopt.GetoptError:
         usage()
 
