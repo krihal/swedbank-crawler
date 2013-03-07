@@ -23,15 +23,6 @@ class SwedbankCrawler(object):
         self.br = mechanize.Browser()
         self.date = datetime.datetime.now().strftime("%m-%d")
 
-    def set_options(self):
-        self.br.set_cookiejar(self.cj)
-        self.br.set_handle_equiv(True)
-        self.br.set_handle_redirect(True)
-        self.br.set_handle_referer(True)
-        self.br.set_handle_robots(False)
-        self.br.follow_meta_refresh = True
-        self.br.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
-
     def crawl(self):
         try:
             br = self.br
@@ -66,7 +57,7 @@ class SwedbankCrawler(object):
         fund = re.findall("\"[\w_]+\"", str)
         value = re.findall(">[\d\s\-]+,\d+<", str)
 
-        if fund == [] or value == []:
+        if not fund or not value:
             return
         
         fund = fund[0].translate(None, "\"")
@@ -127,7 +118,6 @@ def main(argv):
 
     try:
         swedbank = SwedbankCrawler(username, password)
-        swedbank.set_options()
         swedbank.crawl()
         swedbank.parse()
     except Exception, e:
