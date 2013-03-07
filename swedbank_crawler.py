@@ -21,13 +21,9 @@ class SwedbankCrawler(object):
         self.response = ""
         self.cj = cookielib.LWPCookieJar()
         self.br = mechanize.Browser()
-        self.date = datetime.datetime.now().strftime("%b-%d %H")
+        self.date = datetime.datetime.now().strftime("%m-%d")
 
-        self.__set_options__()
-        self.__crawl__()
-        self.__parse__()
-
-    def __set_options__(self):
+    def set_options(self):
         self.br.set_cookiejar(self.cj)
         self.br.set_handle_equiv(True)
         self.br.set_handle_redirect(True)
@@ -36,10 +32,9 @@ class SwedbankCrawler(object):
         self.br.follow_meta_refresh = True
         self.br.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=1)
 
-    def __crawl__(self):
+    def crawl(self):
         try:
             br = self.br
-
             br.open(self.url)
             br.select_form(nr=0)
             br.submit()
@@ -54,12 +49,9 @@ class SwedbankCrawler(object):
             br.submit()
             br.select_form(nr=0)
             br.submit()
-            req = self.br.click_link(text_regex=re.compile("Inneh"))
-            br.open(req)
-            req = self.br.click_link(text_regex=re.compile("versikt"))
-            br.open(req)
-            req = self.br.click_link(text_regex=re.compile("apitalspar"))
-            br.open(req)
+            for caption in ["Inneh", "versikt", "apitalspar"]:
+                req = br.click_link(text_regex = re.compile(caption))
+                br.open(req)
         except Exception, e:
             print e
 
@@ -77,17 +69,10 @@ class SwedbankCrawler(object):
         if fund == [] or value == []:
             return
         
-        fund = fund[0].replace("\"", "")
-        value = value[0].replace(">", "").replace("<", "").replace(" ", "")
+        fund = fund[0].translate(None, "\"")
+        value = value[0].translate(None, "<> ")
 
-        fund = re.sub("\w+_andel", "Andel", fund)
-        fund = re.sub("\w+_kurs", "Kurs", fund)
-        fund = re.sub("\w+_verde", "Värde", fund)
-        fund = re.sub("\w+_forendrkr", "Förändring", fund)
-        fund = re.sub("\w+_anskverde", "Anskaffningsvärde", fund)
-        fund = re.sub("\w+_forendrproc", "Förändringsprocent", fund)
-
-        if fund == "Värde":
+        if re.match('\w+_verde$', fund):
             self.__write_file__(self.lastfund, ("%s;%s;%s" % (self.date, self.lastfund, value.replace(",", "."))))
 
     def __write_file__(self, filename, str):
@@ -95,12 +80,9 @@ class SwedbankCrawler(object):
             fd.write(str + "\n")
             print "Writing file: %s" % filename
 
-        fd.close()
-
-    def __parse__(self):
-        lines = self.response.split("\n")
+    def parse(self):
         linecnt = 0
- 
+        lines = self.response.split("\n")
         for line in lines:
             linecnt += 1
 
@@ -119,23 +101,37 @@ def usage():
     sys.exit(2)
 
 def main(argv):
-    try:
-        opts, args = getopt.getopt(argv,"hu:p:", [])
-
-    except getopt.GetoptError:
+    if len(argv) == 0:
         usage()
+
+    username = None
+    password = None
+
+    try:
+        opts, args = getopt.getopt(argv, "hu:p:", ["username=", "password=", "help"])
+    except getopt.GetoptError:
+        usage()        
 
     for opt, arg in opts:
         if opt == "-h":
             usage()
-        elif opt == "-u":
+        elif opt in ("-u", "--user"):
             username = arg
-        elif opt == "-p":
+        elif opt in ("-p", "--password"):
             password = arg
         else:
             usage()
 
-    swedbank = SwedbankCrawler(username, password)
+    if None in (username, password):
+        usage()
+
+    try:
+        swedbank = SwedbankCrawler(username, password)
+        swedbank.set_options()
+        swedbank.crawl()
+        swedbank.parse()
+    except Exception, e:
+        print "Failed with error: %s" % e
 
 if __name__ == '__main__':
     main(sys.argv[1:])
