@@ -1,0 +1,9 @@
+<html>
+  <ul class=entries>
+    {% for key in entries %}
+    <img src="/static/{{key}}.svg" width=800 height=550>
+      {% else %}
+    <h1>Nothing to see here!</h1>
+      {% endfor %}
+</ul>
+</html>
