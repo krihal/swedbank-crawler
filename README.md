@@ -1,5 +1,6 @@
 swedbank-crawler
 ================
 
-Extremely ugly hack to fetch financial data of your fund at the
-Swedish bank Swedbank. I repeast, ugly as hell.
+Back- and front-end for crawling Swedbank fund data. Dumps everything
+together with a timestamp to a SQLite database and uses pygal to draw
+nice plots.
