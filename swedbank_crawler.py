@@ -61,12 +61,6 @@ class SwedbankCrawler(object):
             print "Failed to open DB: %s" % e
             sys.exit(-2)
             
-    def show_entries(self):
-        db = self.__get_db()
-        cur = db.execute('select * from swedbank')
-        entries = cur.fetchall()
-        return entries
-
     def __get_db(self):
         try:
             sqlite_db = sqlite3.connect('swedbank.db')
@@ -153,7 +147,6 @@ def main(argv):
 
         swedbank.crawl()
         swedbank.parse()
-        print swedbank.show_entries()
     except Exception, e:
         print 'Failed with error: %s' % e
 
