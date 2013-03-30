@@ -9,9 +9,6 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
 
 DATABASE = 'swedbank.db'
 DEBUG = True
-SECRET_KEY = 'topsecretkey'
-USERNAME = 'admin'
-PASSWORD = 'admin'
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -47,7 +44,6 @@ def close_db_connection(exception):
 @app.route('/')
 def show_entries():
     data = dict()
-
     db = get_db()
     cur = db.execute('select * from swedbank order by name')
     entries = cur.fetchall()
@@ -56,9 +52,8 @@ def show_entries():
         if not name in data.keys():
             data[name] = []
         data[name].append(value)
-    for key in data.iterkeys():
-        print data[key]
-        chart = pygal.Bar()
+    for key in data.iterkeys():        
+        chart = pygal.Line()
         chart.add(key, data[key])
         chart.render_to_file('static/%s.svg' % key)
     return render_template('show_entries.html', entries = data.iterkeys())

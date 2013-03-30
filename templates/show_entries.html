@@ -1,9 +1,11 @@
 <html>
-  <ul class=entries>
-    {% for key in entries %}
-    <img src="/static/{{key}}.svg" width=800 height=550>
+  <body bgcolor="black">
+    <ul class=entries>
+      {% for key in entries %}
+      <img src="/static/{{key}}.svg">
       {% else %}
-    <h1>Nothing to see here!</h1>
+      <h1>Nothing to see here!</h1>
       {% endfor %}
+  </body>
 </ul>
 </html>
