@@ -59,5 +59,4 @@ def show_entries():
     return render_template('show_entries.html', entries = data.iterkeys())
 
 if __name__ == '__main__':
-#    init_db()
-    app.run()
+    app.run(host='0.0.0.0')
