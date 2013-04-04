@@ -1,11 +1,14 @@
 <html>
   <body bgcolor="black">
     <ul class=entries>
-      {% for key in entries %}
-      <img src="/static/{{key}}.svg">
-      {% else %}
-      <h1>Nothing to see here!</h1>
-      {% endfor %}
+      <table border="0">
+	{% for key in entries %}
+	<tr>
+	  <embed src="/static/{{key}}.svg" height="50%" width="50%" type="image/svg+xml" codebase="http://www.adobe.com/svg/viewer/install"/>
+	</tr>
+	{% endfor %}
+      </table>
+    </ul>
   </body>
-</ul>
+  </ul>
 </html>
