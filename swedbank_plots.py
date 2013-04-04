@@ -29,12 +29,6 @@ def get_db():
         top.sqlite_db = sqlite_db
     return top.sqlite_db
 
-def get_funds():
-    db = get_db()
-    cur = db.execute('select name from swedbank order by name')
-    entries = cur.fetchall()
-    return entries
-
 @app.teardown_appcontext
 def close_db_connection(exception):
     top = _app_ctx_stack.top
@@ -45,7 +39,7 @@ def close_db_connection(exception):
 def show_entries():
     data = dict()
     db = get_db()
-    cur = db.execute('select * from swedbank order by name')
+    cur = db.execute('select * from swedbank order by id')
     entries = cur.fetchall()
 
     for xid, time, value, name in entries:
