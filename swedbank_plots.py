@@ -6,6 +6,7 @@ import pygal
 from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
     render_template, flash, _app_ctx_stack
+from numpy import arange, array, ones, linalg
 
 DATABASE = 'swedbank.db'
 DEBUG = True
@@ -47,7 +48,12 @@ def show_entries():
             data[name] = []
         data[name].append(value)
     for key in data.iterkeys():        
+        x = arange(0, len(data[key]))
+        A = array([x, ones(len(data[key]))])
+        w = linalg.lstsq(A.T, data[key])[0]
+
         chart = pygal.Line()
+        chart.add('Regression', w[0] * x + w[1])
         chart.add(key, data[key])
         chart.render_to_file('static/%s.svg' % key)
     return render_template('show_entries.html', entries = data.iterkeys())
