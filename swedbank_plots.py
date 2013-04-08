@@ -53,6 +53,8 @@ def show_entries():
         w = linalg.lstsq(A.T, data[key])[0]
 
         chart = pygal.Line()
+        chart.title = key
+        chart.x_labels = map(str, range(1, len(data[key])))
         chart.add('Regression', w[0] * x + w[1])
         chart.add(key, data[key])
         chart.render_to_file('static/%s.svg' % key)

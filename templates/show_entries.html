@@ -3,8 +3,8 @@
     <ul class=entries>
       <table border="0">
 	{% for key in entries %}
-	<tr>
-	  <embed src="/static/{{key}}.svg" height="50%" width="50%" type="image/svg+xml" codebase="http://www.adobe.com/svg/viewer/install"/>
+	<tr>	  
+	  <object type="image/svg+xml" data="/static/{{key}}.svg" height="50%" width="50%" onclick="window.location='/static/{{key}}.svg'; return false;"/>
 	</tr>
 	{% endfor %}
       </table>
