@@ -1,11 +1,14 @@
 <html>
   <body bgcolor="black">
     <ul class=entries>
-      {% for key in entries %}
-      <img src="/static/{{key}}.svg">
-      {% else %}
-      <h1>Nothing to see here!</h1>
-      {% endfor %}
+      <table border="0">
+	{% for key in entries %}
+	<tr>	  
+	  <object type="image/svg+xml" data="/static/{{key}}.svg" height="50%" width="50%" onclick="window.location='/static/{{key}}.svg'; return false;"/>
+	</tr>
+	{% endfor %}
+      </table>
+    </ul>
   </body>
-</ul>
+  </ul>
 </html>
