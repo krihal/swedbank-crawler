@@ -33,6 +33,8 @@ class SwedbankCrawler(object):
             br.submit()
             br.select_form(nr=0)
             br.submit()
+            br.select_form(nr=0)
+            br.submit()
             br.select_form(nr=1)
             br['auth:kundnummer'] = self.username
             br['auth:metod_2'] = ['PIN6']
@@ -46,7 +48,7 @@ class SwedbankCrawler(object):
                 req = br.click_link(text_regex = re.compile(caption))
                 br.open(req)
         except Exception, e:
-            print e
+            print "Crawl: %s" % str(e)
 
         self.response = br.response().read()
 
